@@ -26,13 +26,24 @@ const octokit = new Octokit({ auth: GITHUB_TOKEN });
 // Store task states (use DB in production)
 const taskStates = new Map();
 
-// Helper: Verify secret
+// Helper: Verify secret (safe version)
 function verifySecret(providedSecret) {
-  return crypto.timingSafeEqual(
-    Buffer.from(providedSecret || ''),
-    Buffer.from(SECRET_KEY)
-  );
+  if (!providedSecret || !SECRET_KEY) return false;
+
+  // Trim spaces/newlines just in case (Render can preserve them)
+  const input = Buffer.from(providedSecret.trim());
+  const secret = Buffer.from(SECRET_KEY.trim());
+
+  // Prevent crash if lengths differ
+  if (input.length !== secret.length) return false;
+
+  try {
+    return crypto.timingSafeEqual(input, secret);
+  } catch {
+    return false;
+  }
 }
+
 
 // Helper: Parse attachments
 function parseAttachments(attachments) {
