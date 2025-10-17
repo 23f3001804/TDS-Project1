@@ -250,7 +250,8 @@ app.post('/api-endpoint', async (req, res) => {
       try {
         const parsedAttachments = parseAttachments(attachments);
         const taskState = taskStates.get(task_id) || {};
-        const repoName = repo_name || taskState.repoName || `app-${task_id}`;
+        const repoName = repo_name || taskState.repoName || `app-${task_id}-${Date.now()}`;
+
         const prompt = buildPrompt(brief, parsedAttachments, round, taskState.lastCode || null);
 
         const llmResponse = await callLLM(prompt);
@@ -304,7 +305,7 @@ app.get('/task/:id', (req, res) => {
 
 // 🌐 Root
 app.get('/', (req, res) => {
-  res.send(`<h2>Project 1 TDA</h2><p>Welcome!</p><ul><li><a href="/health">Check Health</a></li><li>POST /api-endpoint</li></ul>`);
+  res.send(`<h2>Project 1 TDS</h2><p>Welcome!</p><ul><li><a href="/health">Check Health</a></li><li>POST /api-endpoint</li></ul>`);
 });
 
 // 🩺 Health Check
